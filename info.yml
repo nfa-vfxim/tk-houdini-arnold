@@ -20,5 +20,27 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# general info about this app
 display_name: "Arnold Render Node"
 description: "A Shotgun Toolkit app to render in Houdini with the Arnold render engine and Deadline."
+documentation_url: "https://wiki.vfxim.nl"
+
+# engine constraints
+supported_engines: [tk-houdini]
+
+# app settings
+configuration:
+  work_file_template:
+    type: template
+    description: >
+      A template which describes the current Houdini work hip file. Used to fetch version.
+
+  output_render_template:
+    type: template
+    description: >
+      A template which describes the output of the beauty render.
+
+  output_aov_template:
+    type: template
+    description: >
+      A template which describes the output of the AOV renders.
