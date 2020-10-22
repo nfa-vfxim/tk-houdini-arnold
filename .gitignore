@@ -1,6 +1,9 @@
 # IDE ignore
 .vscode
 
+# Houdini backup files
+otls/backup
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
