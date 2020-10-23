@@ -30,3 +30,8 @@ class TkHoudiniArnold(sgtk.platform.Application):
 
         tk_houdini_arnold = self.import_module("tk_houdini_arnold")
         self.handler = tk_houdini_arnold.TkHoudiniArnoldHandler(self)
+
+    @staticmethod
+    def get_output_paths():
+        # return output paths
+        output_paths: {}
