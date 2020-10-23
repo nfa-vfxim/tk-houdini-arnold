@@ -30,3 +30,8 @@ class TkHoudiniArnoldHandler(object):
         # initialize class
         
         self.app = app
+
+    # methods executed by the hda
+    
+    def executeToDeadline():
+        # execute the render to deadline logic
