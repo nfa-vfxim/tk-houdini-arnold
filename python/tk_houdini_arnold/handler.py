@@ -22,6 +22,7 @@
 
 import sgtk
 import hou
+import os
 
 class TkHoudiniArnoldHandler(object):
     # handler class for the actual business logic
@@ -33,5 +34,47 @@ class TkHoudiniArnoldHandler(object):
 
     # methods executed by the hda
     
-    def executeToDeadline():
-        # execute the render to deadline logic
+    def updateNode(self, node):
+        # update all node parameters
+        beautyOutputLabel = node.parm("outputLabel")
+        beautyOutputString = node.parm("outputPath")
+
+        # update beauty label and string
+        try:
+            beautyPath = self.__getBeautyPath(node)
+            beautyOutputLabel.set(os.path.split(beautyPath)[1])
+            beautyOutputString.set(beautyPath)
+        except Exception as e:
+            self.app.logger.error("One or more parameters on %s could not be set:" % (node))
+            self.app.logger.error(e)
+
+    # private functions
+
+    def __getBeautyPath(self, node):
+        # get the main render template path
+
+        # get template objects
+        renderTemplate = self.app.get_template("output_render_template")
+        workFileTemplate = self.app.get_template("work_file_template")
+        workFilePath = hou.hipFile.path()
+    
+        # get fields from work file
+        fields = workFileTemplate.get_fields(workFilePath)
+
+        # format sequence key to houdini formatting
+        fields["SEQ"] = "FORMAT: $F"
+
+        # add resolution to fields
+        camPath = node.evalParm("camera")
+        camNode = hou.node(camPath)
+        fields["width"] = camNode.evalParm("resx")
+        fields["height"] = camNode.evalParm("resy")
+
+        self.app.logger.debug(fields)
+
+        # apply fields and create path
+        path = renderTemplate.apply_fields(fields)
+
+        self.app.logger.debug("Built the following path from template: %s" % (path))
+
+        return path
