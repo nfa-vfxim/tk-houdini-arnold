@@ -33,6 +33,19 @@ class TkHoudiniArnoldHandler(object):
 
         self.app = app
 
+    # class wide methods
+
+    def sceneWasSaved(self, event_type):
+        # event callback for saving the scene
+
+        if event_type == hou.hipFileEventType.AfterSave:
+
+            nodes = hou.nodeType(hou.ropNodeTypeCategory(),
+                                 "sgtk_arnold").instances()
+
+            for node in nodes:
+                self.updateNode(node)
+
     # methods executed by the hda
 
     def updateNode(self, node):
@@ -69,6 +82,7 @@ class TkHoudiniArnoldHandler(object):
 
     def __getBeautyPath(self, node):
         # get the main render template path
+        self.app.logger.debug(node)
 
         # get template objects
         renderTemplate = self.app.get_template("output_render_template")
