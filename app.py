@@ -40,3 +40,10 @@ class TkHoudiniArnold(sgtk.platform.Application):
         # breakdown the app
 
         hou.hipFile.removeEventCallback(self.handler.sceneWasSaved)
+
+    def getWorkFileTemplate(self):
+        # return the work file template object
+
+        template = self.get_template("work_file_template")
+
+        return template

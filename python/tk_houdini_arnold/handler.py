@@ -35,13 +35,34 @@ class TkHoudiniArnoldHandler(object):
 
     # class wide methods
 
+    def getDifferentFileAOVs(self, node):
+        # return all enabled aov file parameters
+
+        parms = node.globParms("ar_aov_separate* ^*_file*")
+
+        return parms
+
+    def getOutputPath(self, node):
+        # return the beauty output path currently set
+
+        outputPath = node.parm("outputPath").eval()
+
+        return outputPath
+
+    def getNodes(self):
+        # return all sgtk_arnold node instances
+
+        nodes = hou.nodeType(hou.ropNodeTypeCategory(),
+                             "sgtk_arnold").instances()
+
+        return nodes
+
     def sceneWasSaved(self, event_type):
         # event callback for saving the scene
 
         if event_type == hou.hipFileEventType.AfterSave:
 
-            nodes = hou.nodeType(hou.ropNodeTypeCategory(),
-                                 "sgtk_arnold").instances()
+            nodes = self.getNodes()
 
             for node in nodes:
                 self.updateNode(node)
@@ -64,7 +85,7 @@ class TkHoudiniArnoldHandler(object):
             self.app.logger.error(e)
 
         # get all aov parms that are enabled
-        aovs = self.__getDifferentFileAOVs(node)
+        aovs = self.getDifferentFileAOVs(node)
 
         # for each found parm, update the filepath
         for aov in aovs:
@@ -153,13 +174,6 @@ class TkHoudiniArnoldHandler(object):
         camNode = hou.node(camPath)
 
         return camNode
-
-    def __getDifferentFileAOVs(self, node):
-        # return all enabled aov file parameters
-
-        parms = node.globParms("ar_aov_separate* ^*_file*")
-
-        return parms
 
     def __updateAOVParm(self, node, parm):
         # update the parameter
