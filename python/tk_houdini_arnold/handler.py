@@ -105,6 +105,7 @@ class TkHoudiniArnoldHandler(object):
 
         # apply fields and create path
         path = renderTemplate.apply_fields(fields)
+        path = path.replace('\\', '/')
 
         self.app.logger.debug(
             "Built the following path from template: %s" % (path))
@@ -138,6 +139,7 @@ class TkHoudiniArnoldHandler(object):
 
         # apply fields and create path
         path = aovTemplate.apply_fields(fields)
+        path = path.replace('\\', '/')
 
         self.app.logger.debug(
             "Built the following path from template: %s" % path)
