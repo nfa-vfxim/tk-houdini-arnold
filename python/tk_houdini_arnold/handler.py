@@ -69,6 +69,13 @@ class TkHoudiniArnoldHandler(object):
 
     # methods executed by the hda
 
+    def testMe(self, **kwargs):
+        # quick test dialog
+        hou.qt.Dialog().show()
+        node = kwargs["node"]
+        parm = node.parm("arnold/execute")
+        parm.eval()
+
     def updateNode(self, node):
         # update all node parameters
         beautyOutputLabel = node.parm("outputLabel")
@@ -118,8 +125,8 @@ class TkHoudiniArnoldHandler(object):
 
         # add resolution to fields
         cam = self.__getCameraNode(node)
-        fields["width"] = cam.evalParm("resx")
-        fields["height"] = cam.evalParm("resy")
+        fields["width"] = cam.parm("resx").eval()
+        fields["height"] = cam.parm("resy").eval()
 
         self.app.logger.debug(
             "Using the following fields for path creation: %s" % fields)
@@ -149,8 +156,8 @@ class TkHoudiniArnoldHandler(object):
 
         # add resolution to fields
         cam = self.__getCameraNode(node)
-        fields["width"] = cam.evalParm("resx")
-        fields["height"] = cam.evalParm("resy")
+        fields["width"] = cam.parm("resx").eval()
+        fields["height"] = cam.parm("resy").eval()
 
         # add aov name to fields
         fields["aov_name"] = aov
