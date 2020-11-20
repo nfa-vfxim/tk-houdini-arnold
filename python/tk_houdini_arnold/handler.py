@@ -52,8 +52,7 @@ class TkHoudiniArnoldHandler(object):
     def getNodes(self):
         # return all sgtk_arnold node instances
 
-        nodes = hou.nodeType(hou.ropNodeTypeCategory(),
-                             "sgtk_arnold").instances()
+        nodes = hou.nodeType(hou.ropNodeTypeCategory(), "sgtk_arnold").instances()
 
         return nodes
 
@@ -69,13 +68,6 @@ class TkHoudiniArnoldHandler(object):
 
     # methods executed by the hda
 
-    def testMe(self, **kwargs):
-        # quick test dialog
-        hou.qt.Dialog().show()
-        node = kwargs["node"]
-        parm = node.parm("arnold/execute")
-        parm.eval()
-
     def updateNode(self, node):
         # update all node parameters
         beautyOutputLabel = node.parm("outputLabel")
@@ -86,17 +78,19 @@ class TkHoudiniArnoldHandler(object):
             beautyPath = self.__getBeautyPath(node)
             beautyOutputLabel.set(os.path.split(beautyPath)[1])
             beautyOutputString.set(beautyPath)
+
+            # get all aov parms that are enabled
+            aovs = self.getDifferentFileAOVs(node)
+
+            # for each found parm, update the filepath
+            for aov in aovs:
+                self.__updateAOVParm(node, aov)
+
         except Exception as e:
             self.app.logger.error(
-                "One or more parameters on %s could not be set:" % (node))
+                "One or more parameters on %s could not be set:" % (node)
+            )
             self.app.logger.error(e)
-
-        # get all aov parms that are enabled
-        aovs = self.getDifferentFileAOVs(node)
-
-        # for each found parm, update the filepath
-        for aov in aovs:
-            self.__updateAOVParm(node, aov)
 
     def useDifferentFileAOV(self, **kwargs):
         # callback for use different file on aov's
@@ -123,20 +117,25 @@ class TkHoudiniArnoldHandler(object):
         # format sequence key to houdini formatting
         fields["SEQ"] = "FORMAT: $F"
 
-        # add resolution to fields
+        # resolve camera
         cam = self.__getCameraNode(node)
-        fields["width"] = cam.parm("resx").eval()
-        fields["height"] = cam.parm("resy").eval()
+
+        if cam:
+            # add resolution to fields
+            fields["width"] = cam.parm("resx").eval()
+            fields["height"] = cam.parm("resy").eval()
+        else:
+            raise Exception("No camera was selected!")
 
         self.app.logger.debug(
-            "Using the following fields for path creation: %s" % fields)
+            "Using the following fields for path creation: %s" % fields
+        )
 
         # apply fields and create path
         path = renderTemplate.apply_fields(fields)
-        path = path.replace('\\', '/')
+        path = path.replace("\\", "/")
 
-        self.app.logger.debug(
-            "Built the following path from template: %s" % (path))
+        self.app.logger.debug("Built the following path from template: %s" % (path))
 
         return path
 
@@ -154,23 +153,28 @@ class TkHoudiniArnoldHandler(object):
         # format sequence key to houdini formatting
         fields["SEQ"] = "FORMAT: $F"
 
-        # add resolution to fields
+        # resolve camera
         cam = self.__getCameraNode(node)
-        fields["width"] = cam.parm("resx").eval()
-        fields["height"] = cam.parm("resy").eval()
+
+        if cam:
+            # add resolution to fields
+            fields["width"] = cam.parm("resx").eval()
+            fields["height"] = cam.parm("resy").eval()
+        else:
+            raise Exception("No camera was selected!")
 
         # add aov name to fields
         fields["aov_name"] = aov
 
         self.app.logger.debug(
-            "Using the following fields for path creation: %s" % fields)
+            "Using the following fields for path creation: %s" % fields
+        )
 
         # apply fields and create path
         path = aovTemplate.apply_fields(fields)
-        path = path.replace('\\', '/')
+        path = path.replace("\\", "/")
 
-        self.app.logger.debug(
-            "Built the following path from template: %s" % path)
+        self.app.logger.debug("Built the following path from template: %s" % path)
 
         return path
 
@@ -180,7 +184,27 @@ class TkHoudiniArnoldHandler(object):
         camPath = arnoldNode.evalParm("camera")
         camNode = hou.node(camPath)
 
-        return camNode
+        if hou.node(camPath):
+            return camNode
+        else:
+            # get a new camera
+            newCamPath = hou.ui.selectNode(
+                node_type_filter=hou.nodeTypeFilter.ObjCamera, title="Choose camera"
+            )
+
+            # if a new camera wasn't selected, display a message to the user and exit
+            if newCamPath is None:
+                hou.ui.displayMessage(
+                    "No camera was selected. Create a camera, select it in '%s' and save the file again."
+                    % (arnoldNode),
+                    buttons=("OK",),
+                    severity=hou.severityType.Warning,
+                )
+                return
+            else:
+                camNode = hou.node(newCamPath)
+                arnoldNode.parm("camera").set(newCamPath)
+                return camNode
 
     def __updateAOVParm(self, node, parm):
         # update the parameter
@@ -201,7 +225,8 @@ class TkHoudiniArnoldHandler(object):
                 value = node.parm("ar_aov_label%s" % (aov_number)).eval()
 
             node.parm("ar_aov_separate_file%s" % (aov_number)).set(
-                self.__getAOVPath(value, node))
+                self.__getAOVPath(value, node)
+            )
             node.parm("ar_aov_separate_file%s" % aov_number).lock(True)
 
         # when checkbox is not ticked
