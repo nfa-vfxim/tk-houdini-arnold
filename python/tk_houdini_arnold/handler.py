@@ -63,8 +63,9 @@ class TkHoudiniArnoldHandler(object):
 
             nodes = self.getNodes()
 
-            for node in nodes:
-                self.updateNode(node)
+            if nodes:
+                for node in nodes:
+                    self.updateNode(node)
 
     # methods executed by the hda
 
