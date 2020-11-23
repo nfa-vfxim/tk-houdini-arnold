@@ -52,9 +52,11 @@ class TkHoudiniArnoldHandler(object):
     def getNodes(self):
         # return all sgtk_arnold node instances
 
-        nodes = hou.nodeType(hou.ropNodeTypeCategory(), "sgtk_arnold").instances()
-
-        return nodes
+        try:
+            nodes = hou.nodeType(hou.ropNodeTypeCategory(), "sgtk_arnold").instances()
+            return nodes
+        except AttributeError:
+            return
 
     def sceneWasSaved(self, event_type):
         # event callback for saving the scene
@@ -66,6 +68,10 @@ class TkHoudiniArnoldHandler(object):
             if nodes:
                 for node in nodes:
                     self.updateNode(node)
+            else:
+                self.app.logger.info(
+                    "Skipping SGTK Arnold collection since no instances were found."
+                )
 
     # methods executed by the hda
 
