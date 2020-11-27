@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 import sgtk
+import hou
+
 
 class TkHoudiniArnold(sgtk.platform.Application):
     # shotgun arnold output node
@@ -30,3 +32,18 @@ class TkHoudiniArnold(sgtk.platform.Application):
 
         tk_houdini_arnold = self.import_module("tk_houdini_arnold")
         self.handler = tk_houdini_arnold.TkHoudiniArnoldHandler(self)
+
+        # register callback
+        hou.hipFile.addEventCallback(self.handler.sceneWasSaved)
+
+    def destroy_app(self):
+        # breakdown the app
+
+        hou.hipFile.removeEventCallback(self.handler.sceneWasSaved)
+
+    def getWorkFileTemplate(self):
+        # return the work file template object
+
+        template = self.get_template("work_file_template")
+
+        return template
