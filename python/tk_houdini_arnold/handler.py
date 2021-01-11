@@ -124,6 +124,9 @@ class TkHoudiniArnoldHandler(object):
         # format sequence key to houdini formatting
         fields["SEQ"] = "FORMAT: $F"
 
+        # replace name with renderpass name
+        fields["name"] = self.__getRenderpassName(node)
+
         # resolve camera
         cam = self.__getCameraNode(node)
 
@@ -159,6 +162,9 @@ class TkHoudiniArnoldHandler(object):
 
         # format sequence key to houdini formatting
         fields["SEQ"] = "FORMAT: $F"
+
+        # replace name with renderpass name
+        fields["name"] = self.__getRenderpassName(node)
 
         # resolve camera
         cam = self.__getCameraNode(node)
@@ -242,3 +248,11 @@ class TkHoudiniArnoldHandler(object):
             parm_path.lock(False)
             parm_path.set("Disabled")
             parm_path.lock(True)
+
+    def __getRenderpassName(self, node):
+        # get the renderpass name from the supplied node
+
+        parm = node.parm("renderpass")
+        name = parm.eval()
+
+        return name
