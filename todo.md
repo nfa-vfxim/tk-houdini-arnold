@@ -7,3 +7,4 @@
 - Add Deadline subprocess functions.
 - Add slate/preview functions.
 - ~~Move repo to /nfa-vfxim instead of /bkamphues.~~
+- Add publish plugin for automatically creating a review version.
