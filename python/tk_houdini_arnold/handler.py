@@ -86,6 +86,9 @@ class TkHoudiniArnoldHandler(object):
             beautyOutputLabel.set(os.path.split(beautyPath)[1])
             beautyOutputString.set(beautyPath)
 
+            # update ass file location
+            self.__updateASSParm(node)
+
             # get all aov parms that are enabled
             aovs = self.getDifferentFileAOVs(node)
 
@@ -106,6 +109,14 @@ class TkHoudiniArnoldHandler(object):
         parm = kwargs["parm"]
 
         self.__updateAOVParm(node, parm)
+
+    def exportASSFile(self, **kwargs):
+        # callback when export ass files is selected
+
+        node = kwargs["node"]
+        parm = kwargs["parm"]
+
+        self.__updateASSParm(node, parm)
 
     # private functions
 
@@ -146,6 +157,41 @@ class TkHoudiniArnoldHandler(object):
         path = path.replace("\\", "/")
 
         self.app.logger.debug("Built the following path from template: %s" % (path))
+
+        return path
+
+    def __getASSPath(self, node):
+        # get the ass file template path
+
+        # get template objects
+        assTemplate = self.app.get_template("output_ass_template")
+        workFileTemplate = self.app.get_template("work_file_template")
+        workFilePath = hou.hipFile.path()
+
+        # get fields from work file
+        fields = workFileTemplate.get_fields(workFilePath)
+
+        # format sequence key to houdini formatting
+        fields["SEQ"] = "FORMAT: $F"
+
+        # replace name with renderpass name
+        fields["name"] = self.__getRenderpassName(node)
+
+        # resolve camera
+        cam = self.__getCameraNode(node)
+
+        if cam:
+            # add resolution to fields
+            fields["width"] = cam.parm("resx").eval()
+            fields["height"] = cam.parm("resy").eval()
+        else:
+            raise Exception("No camera was selected!")
+
+        # build path
+        path = assTemplate.apply_fields(fields)
+        path = path.replace("\\", "/")
+
+        self.app.logger.debug("Built the following path from template: %s" % path)
 
         return path
 
@@ -245,6 +291,20 @@ class TkHoudiniArnoldHandler(object):
         # when checkbox is not ticked
         else:
             parm_path = node.parm("ar_aov_separate_file%s" % aov_number)
+            parm_path.lock(False)
+            parm_path.set("Disabled")
+            parm_path.lock(True)
+
+    def __updateASSParm(self, node, parm):
+        # update ass file location parameter
+
+        # if checkbox is ticked
+        if parm.eval():
+            node.parm("ar_ass_file").lock(False)
+            node.parm("ar_ass_file").set(self.__getASSPath(node))
+            node.parm("ar_ass_file").lock(True)
+        else:
+            parm_path = node.parm("ar_ass_file")
             parm_path.lock(False)
             parm_path.set("Disabled")
             parm_path.lock(True)
