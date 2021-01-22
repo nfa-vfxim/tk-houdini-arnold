@@ -114,9 +114,8 @@ class TkHoudiniArnoldHandler(object):
         # callback when export ass files is selected
 
         node = kwargs["node"]
-        parm = kwargs["parm"]
 
-        self.__updateASSParm(node, parm)
+        self.__updateASSParm(node)
 
     # private functions
 
@@ -295,8 +294,11 @@ class TkHoudiniArnoldHandler(object):
             parm_path.set("Disabled")
             parm_path.lock(True)
 
-    def __updateASSParm(self, node, parm):
+    def __updateASSParm(self, node):
         # update ass file location parameter
+
+        # set parm
+        parm = node.parm("ar_ass_export_enable")
 
         # if checkbox is ticked
         if parm.eval():
