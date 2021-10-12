@@ -22,6 +22,7 @@
 
 import sgtk
 import hou
+import os
 
 
 class TkHoudiniArnold(sgtk.platform.Application):
@@ -30,16 +31,23 @@ class TkHoudiniArnold(sgtk.platform.Application):
     def init_app(self):
         # initialize the app
 
-        tk_houdini_arnold = self.import_module("tk_houdini_arnold")
-        self.handler = tk_houdini_arnold.TkHoudiniArnoldHandler(self)
+        # Only initialize when HtoA is loaded
+        htoa_env = os.getenv('HTOA')
 
-        # register callback
-        hou.hipFile.addEventCallback(self.handler.sceneWasSaved)
+        if htoa_env:
+            tk_houdini_arnold = self.import_module("tk_houdini_arnold")
+            self.handler = tk_houdini_arnold.TkHoudiniArnoldHandler(self)
+
+            # register callback
+            hou.hipFile.addEventCallback(self.handler.sceneWasSaved)
+
+        else:
+            self.logger.info("Arnold is not loaded. Skipping importing for tk-houdini-arnold.")
 
     def destroy_app(self):
         # breakdown the app
-
-        hou.hipFile.removeEventCallback(self.handler.sceneWasSaved)
+        if self.htoa_env:
+            hou.hipFile.removeEventCallback(self.handler.sceneWasSaved)
 
     def getWorkFileTemplate(self):
         # return the work file template object
