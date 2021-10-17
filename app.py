@@ -32,9 +32,9 @@ class TkHoudiniArnold(sgtk.platform.Application):
         # initialize the app
 
         # Only initialize when HtoA is loaded
-        htoa_env = os.getenv('HTOA')
+        self.htoa_env = os.getenv('HTOA')
 
-        if htoa_env:
+        if self.htoa_env:
             tk_houdini_arnold = self.import_module("tk_houdini_arnold")
             self.handler = tk_houdini_arnold.TkHoudiniArnoldHandler(self)
 
