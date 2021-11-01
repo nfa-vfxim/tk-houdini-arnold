@@ -42,16 +42,22 @@ class TkHoudiniArnold(sgtk.platform.Application):
             hou.hipFile.addEventCallback(self.handler.sceneWasSaved)
 
         else:
-            self.logger.info("Arnold is not loaded. Skipping importing for tk-houdini-arnold.")
+            self.logger.debug("Arnold is not loaded. Skipping importing for tk-houdini-arnold.")
 
     def destroy_app(self):
         # breakdown the app
         if self.htoa_env:
             hou.hipFile.removeEventCallback(self.handler.sceneWasSaved)
 
-    def getWorkFileTemplate(self):
+    def get_work_file_template(self):
         # return the work file template object
 
         template = self.get_template("work_file_template")
+
+        return template
+
+    def get_publish_file_template(self):
+
+        template = self.get_template("output_render_template")
 
         return template
