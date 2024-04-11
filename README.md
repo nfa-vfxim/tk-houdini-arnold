@@ -1,23 +1,30 @@
-# tk-houdini-arnold
+[![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/nfa-vfxim/tk-houdini-arnold?include_prereleases)](https://github.com/nfa-vfxim/tk-houdini-arnold) 
+[![GitHub issues](https://img.shields.io/github/issues/nfa-vfxim/tk-houdini-arnold)](https://github.com/nfa-vfxim/tk-houdini-arnold/issues) 
 
-tk-houdini-arnold is a Shotgun Toolkit app to render via the Arnold render engine in Houdini with Deadline support.
 
-## Installation
+# Arnold Render Node
 
-- To be implemented.
+[![Documentation](https://img.shields.io/badge/documentation-blue?style=for-the-badge)](https://wiki.vfxim.nl)
 
-## Usage
+A Shotgun Toolkit app to render in Houdini with the Arnold render engine and Deadline.
 
-- To be implemented.
+> Supported engines: tk-houdini
+
+## Requirements
+
+| ShotGrid version | Core version | Engine version |
+|------------------|--------------|----------------|
+| -                | -            | -              |
 
 ## Configuration
 
-- To be implemented.
+### Templates
 
-## Contributing
+| Name                     | Description                                                                          | Default value | Fields                                                          |
+|--------------------------|--------------------------------------------------------------------------------------|---------------|-----------------------------------------------------------------|
+| `work_file_template`     | A template which describes the current Houdini work hip file. Used to fetch version. |               | context, version, [name], *                                     |
+| `output_render_template` | A template which describes the output of the beauty render.                          |               | context, version, SEQ, [aov_name], [name], [width], [height], * |
+| `output_aov_template`    | A template which describes the output of the AOV renders.                            |               | context, version, SEQ, [aov_name], [name], [width], [height], * |
+| `output_ass_template`    | A template which describes the output of the ASS files.                              |               | context, version, SEQ, [name], [width], [height], *             |
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
